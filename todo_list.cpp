@@ -276,13 +276,13 @@ public:
     void addTask(const string& title, int priority)
     {
         if (title.empty())
-            { cout << "\n  [!] Title cannot be empty.\n"; return; }
+            { cout << "\n   Title cannot be empty.\n"; return; }
         if (priority < 1 || priority > 10)
-            { cout << "\n  [!] Priority must be 1-10.\n"; return; }
+            { cout << "\n  Priority must be 1-10.\n"; return; }
 
         if (priorityTaken(priority))
         {
-            cout << "\n  [~] P" << priority
+            cout << "\n  P" << priority
                  << " is occupied. Cascading existing tasks down:\n";
             cascadeDown(priority);
         }
@@ -305,8 +305,8 @@ public:
     void markDone(int id)
     {
         TaskNode* t = findById(id);
-        if (!t)     { cout << "\n  [!] Task ID " << id << " not found.\n"; return; }
-        if (t->done){ cout << "\n  [!] Task already done.\n"; return; }
+        if (!t)     { cout << "\n  Task ID " << id << " not found.\n"; return; }
+        if (t->done){ cout << "\n  Task already done.\n"; return; }
         t->done = true;
         heap.removeById(id);
         if (t->inPlanner) { planner.remove(id); t->inPlanner = false; }
@@ -326,12 +326,12 @@ public:
                 if (prev) prev->next = cur->next;
                 else      head       = cur->next;
                 delete cur;
-                cout << "\n  [-] Task " << id << " deleted. (Undo available)\n";
+                cout << "\n  Task " << id << " deleted. (Undo available)\n";
                 return;
             }
             prev = cur; cur = cur->next;
         }
-        cout << "\n  [!] Task ID " << id << " not found.\n";
+        cout << "\n  Task ID " << id << " not found.\n";
     }
 
     void display()
@@ -388,7 +388,7 @@ public:
     void undoDelete()
     {
         if (undoStack.isEmpty())
-            { cout << "\n  [!] Nothing to undo.\n"; return; }
+            { cout << "\n  Nothing to undo.\n"; return; }
 
         TaskNode* r  = undoStack.pop();
         r->next      = nullptr;
@@ -396,14 +396,14 @@ public:
 
         if (!r->done && priorityTaken(r->priority))
         {
-            cout << "\n  [~] P" << r->priority
+            cout << "\n  P" << r->priority
                  << " now occupied. Cascading to free slot:\n";
             cascadeDown(r->priority);
         }
 
         appendNode(r);
         if (!r->done) heap.insert(r->priority, r->id);
-        cout << "\n  [<] \"" << r->title
+        cout << "\n  \"" << r->title
              << "\" restored at P" << r->priority << "!\n";
     }
 
@@ -458,8 +458,8 @@ public:
     void changePriority(int id, int newP)
     {
         TaskNode* t = findById(id);
-        if (!t)      { cout << "\n  [!] Task ID " << id << " not found.\n"; return; }
-        if (t->done) { cout << "\n  [!] Cannot change priority of a done task.\n"; return; }
+        if (!t)      { cout << "\n  Task ID " << id << " not found.\n"; return; }
+        if (t->done) { cout << "\n   Cannot change priority of a done task.\n"; return; }
         if (newP < 1 || newP > 10) { cout << "\n  [!] Priority must be 1-10.\n"; return; }
 
         int oldP = t->priority;
@@ -468,7 +468,7 @@ public:
 
         if (priorityTaken(newP))
         {
-            cout << "\n  [~] P" << newP << " is occupied. Cascading:\n";
+            cout << "\n   P" << newP << " is occupied. Cascading:\n";
             cascadeDown(newP);
         }
 
@@ -481,18 +481,18 @@ public:
     void addToPlanner(int id)
     {
         TaskNode* t = findById(id);
-        if (!t)           { cout << "\n  [!] Task ID " << id << " not found.\n"; return; }
-        if (t->done)      { cout << "\n  [!] Cannot plan a completed task.\n"; return; }
-        if (t->inPlanner) { cout << "\n  [!] Task already in today's planner.\n"; return; }
+        if (!t)           { cout << "\n   Task ID " << id << " not found.\n"; return; }
+        if (t->done)      { cout << "\n  Cannot plan a completed task.\n"; return; }
+        if (t->inPlanner) { cout << "\n   Task already in today's planner.\n"; return; }
 
         if (planner.enqueue(id))
         {
             t->inPlanner = true;
-            cout << "\n  [>] \"" << t->title
+            cout << "\n  \"" << t->title
                  << "\" added to planner  (Queue position: "
                  << planner.size() << ")\n";
         }
-        else cout << "\n  [!] Planner is full.\n";
+        else cout << "\n  Planner is full.\n";
     }
 
     void displayPlanner()
@@ -533,7 +533,7 @@ public:
     void plannerDoneNext()
     {
         if (planner.isEmpty())
-            { cout << "\n  [!] Planner is empty.\n"; return; }
+            { cout << "\n  Planner is empty.\n"; return; }
 
         int id        = planner.dequeue();
         TaskNode* t   = findById(id);
@@ -542,14 +542,14 @@ public:
             t->done      = true;
             t->inPlanner = false;
             heap.removeById(id);
-            cout << "\n  [v] \"" << t->title << "\" marked done!\n";
+            cout << "\n   \"" << t->title << "\" marked done!\n";
         }
 
         if (!planner.isEmpty())
         {
             TaskNode* next = findById(planner.peek());
             if (next)
-                cout << "  [>] Next up: P" << next->priority
+                cout << "  Next up: P" << next->priority
                      << "  \"" << next->title << "\"\n";
         }
         else cout << "  [*] Planner complete for today!\n";
@@ -558,9 +558,9 @@ public:
     void plannerSkip()
     {
         if (planner.isEmpty())
-            { cout << "\n  [!] Planner is empty.\n"; return; }
+            { cout << "\n Planner is empty.\n"; return; }
         if (planner.size() == 1)
-            { cout << "\n  [!] Only one task -- cannot skip.\n"; return; }
+            { cout << "\n  [Only one task -- cannot skip.\n"; return; }
 
         int id = planner.dequeue();
         planner.enqueue(id);   
@@ -569,7 +569,7 @@ public:
 
         TaskNode* next = findById(planner.peek());
         if (next)
-            cout << "\n  [>] Skipped. Next up: P" << next->priority
+            cout << "\n  Skipped. Next up: P" << next->priority
                  << "  \"" << next->title << "\"\n";
     }
 
@@ -635,7 +635,7 @@ int getPriority()
     int p;
     cout << "  Priority (1 = most urgent, 10 = least urgent): ";
     cin >> p; cin.ignore();
-    if (p < 1 || p > 10) { cout << "  [!] Invalid. Defaulting to 5.\n"; return 5; }
+    if (p < 1 || p > 10) { cout << "Invalid. Defaulting to 5.\n"; return 5; }
     return p;
 }
 
@@ -720,7 +720,7 @@ int main()
             return 0;
 
         default:
-            cout << "\n  [!] Invalid option. Try again.\n";
+            cout << "\n Invalid option. Try again.\n";
         }
     }
 }
